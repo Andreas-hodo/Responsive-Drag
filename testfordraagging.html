@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.0-2/css/all.min.css" integrity="sha256-46r060N2LrChLLb5zowXQ72/iKKNiw/lAmygmHExk/o=" crossorigin="anonymous">
+<style>
+body{
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+ }
+
+#resultpopup{
+    position: absolute;
+    display:flex;
+    align-items:center;
+    justify-content: center;
+    border: 1px solid black;
+    border-radius: 10px;
+    width:15em;
+    height:4em;
+    /* width:2em;
+    height:5em; */
+    background-color:#484848;
+    font-size: 1.1em;
+    font-family: monospace;
+}
+#movebtn{
+    position: absolute;
+    display: flex;
+    top:0;
+    background-color: red;
+    height: 7%;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+    border-radius: 10px 10px 0px 0px;
+    font-size: 1.5em;
+    color: white;
+    background-color: green;
+
+}
+</style> 
+<body>
+<div id="resultpopup">
+    <div id="movebtn"><i class="fas fa-ellipsis-h"></i></div>
+</div>
+</body>
+<script> 
+var drag_btn = document.getElementById("movebtn")
+    let my_id = document.getElementById("resultpopup")
+    let StartX;
+    let StartY;
+    let buttonX;
+    let buttonY;
+    let StartScreenX;
+    let StartScreenY;
+    drag_btn.addEventListener("pointerdown",(e)=>{
+    drag_btn.style.backgroundColor = "red"
+    drag_btn.classList.add("dragging")
+    e.preventDefault()
+     StartX = e.layerX - ((drag_btn.clientWidth / 2) - 2)
+     StartY = e.layerY - ((drag_btn.clientHeight / 2) - 2.2)
+    buttonX = StartX
+    buttonY = StartY
+    my_id.style.transform = `translate(${StartX}px,${StartY}px)` 
+    StartScreenX = e.screenX
+    StartScreenY = e.screenY
+    })
+    document.addEventListener("pointermove",(e)=>{
+        if(drag_btn.classList.contains("dragging")){
+         e.preventDefault()
+    my_id.style.transform = `translate(${StartX}px,${StartY}px)`
+    let x = e.screenX-StartScreenX + buttonX
+    let y =  e.screenY-StartScreenY + buttonY
+    my_id.style.transform = `translate(${x}px,${y}px)`   
+        }      
+    })
+     drag_btn.addEventListener("pointermove",(e)=>{
+    if(drag_btn.classList.contains("dragging")){
+        e.preventDefault()
+    my_id.style.transform = `translate(${StartX}px,${StartY}px)`
+    let x = e.screenX-StartScreenX + StartX
+    let y =  e.screenY-StartScreenY + StartY
+    my_id.style.transform = `translate(${x}px,${y}px)` 
+    }
+    })
+      drag_btn.addEventListener("touchmove",(e)=>{
+    if(drag_btn.classList.contains("dragging")){
+    e.preventDefault()
+    let x = e.targetTouches[0].screenX-StartScreenX + StartX 
+    let y =  e.targetTouches[0].screenY-StartScreenY + StartY 
+    my_id.style.transform = `translate(${x}px,${y}px)` 
+    }
+    }) 
+    drag_btn.addEventListener("pointerup",(e)=>{
+        drag_btn.classList.remove("dragging")
+        drag_btn.style.backgroundColor = "green"
+    })
+    </script>
+</html>
