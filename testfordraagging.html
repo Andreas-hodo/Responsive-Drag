@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.0-2/css/all.min.css" integrity="sha256-46r060N2LrChLLb5zowXQ72/iKKNiw/lAmygmHExk/o=" crossorigin="anonymous">
+<style>
+body{
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+ }
+
+#resultpopup{
+    position: relative;
+    display:flex;
+    align-items:center;
+    justify-content: center;
+    border: 1px solid black;
+    border-radius: 10px;
+    width:5em;
+    height:20em;
+    /* width:2em;
+    height:5em; */
+    background-color:#484848;
+    font-size: 1.1em;
+    font-family: monospace;
+     z-index:5;
+}
+#movebtn{
+    position: absolute;
+    display: flex;
+    top:0;
+    background-color: red;
+    height: 7%;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+    border-radius: 10px 10px 0px 0px;
+    font-size: 1.5em;
+    color: white;
+    background-color: green;
+
+}
+.container{
+    position: relative;
+    width:40%;
+    height: 20em;
+    background-color: red;
+    border: 1px solid black;
+    margin-left: 30px;
+}
+</style> 
+<body>
+<div id="container1" class="container">
+<div id="resultpopup" draggable="true">
+    <div id="movebtn" draggable="true" ><i class="fas fa-ellipsis-h"></i></div>
+</div>
+</div>
+<div id="container2" class="container">
+</div>
+</body>
+<script> 
+class DragDrop{
+    constructor(button,element){
+        this.drag_btn = button
+        this.my_id = element
+        this.parent = this.my_id.parentNode
+        this.StartX;
+        this.StartY;
+        this.buttonX;
+        this.buttonY;
+        this.StartScreenX;
+        this.StartScreenY;
+        this.newX;
+        this.newY;
+        this.startPos;
+        this.dropParent = null;
+    }
+   Dragstart(callback){
+    this.drag_btn.addEventListener("pointerdown",(e)=>{
+        if(this.drag_btn.draggable){
+            this.parent = this.my_id.parentNode
+            this.startPos = this.my_id.style.transform
+            this.drag_btn.style.backgroundColor = "red"
+            this.drag_btn.classList.add("dragging")
+            e.preventDefault()
+            this.StartX = e.layerX - ((this.drag_btn.clientWidth / 2) - 2)
+            this.StartY = e.layerY - ((this.drag_btn.clientHeight / 2) - 2.2)
+            this.buttonX = this.StartX
+            this.buttonY = this.StartY
+            this.my_id.style.transform = `translate(${this.StartX}px,${this.StartY}px)` 
+            this.StartScreenX = e.screenX
+            this.StartScreenY = e.screenY
+            callback(this.my_id)
+        }
+    })
+    return this.my_id
+    }
+    Dragmove(){
+    document.addEventListener("pointermove",(e)=>{
+        if(this.drag_btn.classList.contains("dragging") && this.drag_btn.draggable){
+         e.preventDefault()
+    this.my_id.style.transform = `translate(${this.StartX}px,${this.StartY}px)`
+     let x = e.screenX- this.StartScreenX + this.buttonX
+    let  y =  e.screenY- this.StartScreenY + this.buttonY
+    this.my_id.style.transform = `translate(${x}px,${y}px)`   
+        }      
+    })
+     this.drag_btn.addEventListener("pointermove",(e)=>{
+    if(this.drag_btn.classList.contains("dragging") && this.drag_btn.draggable){
+        e.preventDefault()  
+    this.my_id.style.transform = `translate(${this.StartX}px,${this.StartY}px)`
+    let  x = e.screenX- this.StartScreenX + this.StartX
+    let  y =  e.screenY- this.StartScreenY + this.StartY
+    this.my_id.style.transform = `translate(${x}px,${y}px)`
+    }
+    })
+      this.drag_btn.addEventListener("touchmove",(e)=>{
+    if(this.drag_btn.classList.contains("dragging") && this.drag_btn.draggable){
+    e.preventDefault()
+    let  x = e.targetTouches[0].screenX- this.StartScreenX + this.StartX 
+    let  y = e.targetTouches[0].screenY- this.StartScreenY + this.StartY 
+    this.my_id.style.transform = `translate(${x}px,${y}px)` 
+    }
+    })  
+   }
+   Drop(callback){
+    this.drag_btn.addEventListener("pointerup",(e)=>{
+        this.dropParent = parent.id
+        if(this.drag_btn.draggable){
+        this.drag_btn.classList.remove("dragging")
+        this.drag_btn.style.backgroundColor = "green"
+        this.my_id.style.visibility = "hidden" 
+        let belowId = document.elementFromPoint(e.clientX,e.clientY)
+        this.my_id.style.visibility = "visible"
+        if(belowId){
+         if(!belowId.classList.contains("container") || this.parent.id == belowId.id){  
+            this.drag_btn.classList.remove("dragging")
+               this.my_id.style.transform = this.startPos
+               this.dropParent = null
+        }else if(belowId.classList.contains("container")){
+            this.dropParent = belowId
+        }
+        } 
+        callback(this.dropParent)       
+        }
+    })  
+   }
+}
+
+var drag_btn = document.getElementById("movebtn");
+let my_id = document.getElementById("resultpopup");
+let resultpopup = new DragDrop(drag_btn,my_id);
+resultpopup.Dragstart(elem =>{
+    console.log(elem)
+});
+resultpopup.Dragmove();
+resultpopup.Drop(elem =>{
+    console.log(elem)
+});
+
+var elem = document.getElementById(resultpopup.dropParent)
+if(elem){
+ elem.appendChild(resultpopup.my_id)   
+}
+</script>
+</html>
